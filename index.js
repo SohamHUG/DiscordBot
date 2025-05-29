@@ -1,6 +1,8 @@
-import { Client, GatewayIntentBits, Events } from 'discord.js';
-import { joinVoiceChannel, getVoiceConnection } from '@discordjs/voice';
+import { Client, GatewayIntentBits, Events, ConnectionService } from 'discord.js';
+import { joinVoiceChannel, getVoiceConnection, createAudioPlayer, NoSubscriberBehavior, createAudioResource } from '@discordjs/voice';
 import dotenv from 'dotenv';
+import path from 'path';
+
 
 dotenv.config();
 
@@ -15,6 +17,12 @@ const client = new Client({
         GatewayIntentBits.GuildVoiceStates,
     ]
 })
+
+const player = createAudioPlayer({
+    behaviors: {
+        noSubscriber: NoSubscriberBehavior.Pause,
+    },
+});
 
 client.once(Events.ClientReady, () => {
     console.log(`Connecté en tant que ${client.user.tag}`);
@@ -37,7 +45,7 @@ client.on(Events.MessageCreate, async (message) => {
     }
 
     if (message.content === '/ff') {
-        await message.reply('GG GO NEXT. REPORT <@795281648849518592>');
+        await message.reply('FF GO NEXT. REPORT <@795281648849518592>');
     }
 
     if (message.content === '/gg') {
@@ -48,18 +56,28 @@ client.on(Events.MessageCreate, async (message) => {
         await message.reply('Brice il est où mon feu ? <@626076528463052802>');
     }
 
-    if (message.content === '/play') {
+    if (message.content.startsWith('/play')) {
+        // console.log(message.content);
+
         const channel = message.member.voice.channel;
+
         if (!channel) {
             return message.reply(`Vas dans un salon vocal l'amis ! ${message.author}`);
         }
+
         try {
-            joinVoiceChannel({
+            const connection = joinVoiceChannel({
                 channelId: channel.id,
                 guildId: channel.guild.id,
                 adapterCreator: channel.guild.voiceAdapterCreator,
-                selfDeaf: false 
+                selfDeaf: false
             });
+
+            connection.subscribe(player);
+            const resource = createAudioResource(path.resolve('audio/test.mp3'));
+
+            player.play(resource);
+
             await message.reply('Mié là');
         } catch (err) {
             console.error(err);
@@ -75,6 +93,7 @@ client.on(Events.MessageCreate, async (message) => {
         try {
             const connection = getVoiceConnection(message.guild.id);
             if (connection) {
+                player.stop();
                 connection.destroy();
                 await message.reply('Trouve ça !');
             } else {
