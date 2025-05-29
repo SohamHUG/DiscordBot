@@ -56,6 +56,10 @@ client.on(Events.MessageCreate, async (message) => {
         await message.reply('Brice il est où mon feu ? <@626076528463052802>');
     }
 
+    if (message.content === '/brice') {
+        await message.reply('Qui est <@626076528463052802> ? Un ti joueur valo pour les uns, un kapayèr briquet pour les autres. Mais pour tout le monde, le plus gros maille grenn de la terre !');
+    }
+
     if (message.content.startsWith('/play')) {
         const channel = message.member.voice.channel;
         if (!channel) {
