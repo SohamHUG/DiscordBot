@@ -57,8 +57,6 @@ client.on(Events.MessageCreate, async (message) => {
     }
 
     if (message.content.startsWith('/play')) {
-        // console.log(message.content);
-
         const channel = message.member.voice.channel;
 
         if (!channel) {
