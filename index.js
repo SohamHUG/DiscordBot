@@ -58,7 +58,6 @@ client.on(Events.MessageCreate, async (message) => {
 
     if (message.content.startsWith('/play')) {
         const channel = message.member.voice.channel;
-
         if (!channel) {
             return message.reply(`Vas dans un salon vocal l'amis ! ${message.author}`);
         }
